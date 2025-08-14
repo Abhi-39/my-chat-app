@@ -1,0 +1,180 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "868003fa-a272-4009-a576-fc6990b3d48f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a0076cdf-3f9d-4520-a241-088c0c185b74",
+      "name": "Webhook",
+      "webhookId": "868003fa-a272-4009-a576-fc6990b3d48f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "10f0df5a-705e-4403-ae7b-9dd209f905fe",
+              "leftValue": "={{ $json.body.event.data.new.sender.toString().trim().toLowerCase() }}",
+              "rightValue": "user",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b2c97a14-73ce-42cb-b800-cea40ed1e04a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "body": "={   \"model\": \"z-ai/glm-4.5-air:free\",   \"messages\": [     {       \"role\": \"system\",       \"content\": \"You are a helpful chatbot.\"     },     {       \"role\": \"user\",       \"content\": \"={{$json.body.event.data.new.content}}\"     }   ] }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "1ab9786e-4718-4ca4-901b-a14ef7ceb475",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://afwfyfozscdgvevssbjn.hasura.ap-south-1.nhost.run/v1/graphql",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-hasura-admin-secret",
+              "value": "6,yWjR%t7Q6amM=G6#1ps=*TTdvox#f:"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "mutation {   insert_messages_one(object: {     chat_id: \"a5cd76b3-a2f8-4abc-88ca-632556b00ed1\",     sender: \"user\",     content: \"Hello bot, this is my first real test!\"   }) {     id     content   } }"
+            },
+            {
+              "name": "chat_id",
+              "value": "=$json.body.event.data.new.chat_id"
+            },
+            {
+              "name": "content",
+              "value": "=$node[\"HTTP Request\"].json.choices.message.content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "e498c0d1-66aa-49fb-a8cc-59af930c6932",
+      "name": "HTTP Request1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8763d556-9312-4633-9926-c24cb5a1efa3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "647146175301a3d4bd53002a5fd91034829000cc6dc1158f55a511a051e98fc9"
+  },
+  "id": "76cL6EEEmU7Fx5ji",
+  "tags": []
+}
