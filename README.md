@@ -17,10 +17,23 @@ This project is a real-time chatbot that combines:
 ## Folder Structure
 ```
 project/
-  ├── metadata.json               # Hasura metadata export
-  ├── n8n-workflow.json           # Exported n8n workflow JSON (fixed with dynamic chat_id & sender)
-  ├── frontend/                   # React project source code folder
-  ├── README.md                   # This file
+│
+├── metadata.json               # Hasura metadata export
+├── n8n-workflow.json           # Exported n8n workflow JSON (fixed with dynamic chat_id & sender)
+│
+├── frontend/                   # React project source code
+│   ├── public
+│   │    └── index.html         # Main HTML file
+│   ├── src
+│   │    ├── App.js             # Main component
+│   │    ├── index.js           # React entry point
+│   │    └── components
+│   │         └── Chat.js       # Chat functionality component
+│   ├── package.json            # npm config for frontend
+│   └── README.md               # Frontend-specific documentation (optional)
+│
+└── README.md                   # Main project README (Hasura + n8n + React + deployment guide)
+
 ```
 
 ***
